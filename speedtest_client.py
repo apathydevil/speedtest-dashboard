@@ -1,0 +1,23 @@
+import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+url = os.getenv("SPEEDTEST_URL")
+token = os.getenv("SPEEDTEST_TOKEN")
+
+headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
+
+def get_latest_result() -> None | dict :
+    try:
+        response = requests.get(f"{url}/api/v1/results/latest", headers=headers)
+        data = response.json()
+        latest = data["data"]
+        return {
+            "download": latest["download_bits_human"],
+            "upload": latest["upload_bits_human"],
+            "ping": latest["ping"],
+            "created_at": latest["created_at"],
+        }
+    except requests.RequestException as e:
+        print(e)

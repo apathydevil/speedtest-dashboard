@@ -28,3 +28,13 @@ def get_stats() -> None | dict:
         return response.json()["data"]
     except requests.RequestException as e:
         print(e)
+
+def get_result_history() -> None | dict:
+    try:
+        response = requests.get(
+            f"{url}/api/v1/results", 
+            headers=headers,
+            params= {"page[size]": 10, "sort": "-created_at"})
+        return response.json()["data"]
+    except requests.RequestException as e:
+        print(e)

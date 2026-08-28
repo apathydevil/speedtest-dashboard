@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from speedtest_client import get_latest_result, get_stats
+from speedtest_client import get_latest_result, get_stats, get_result_history
 
 app = FastAPI()
 
@@ -8,10 +8,22 @@ app = FastAPI()
 def homepage() -> str:
     result = get_latest_result()    
     stats = get_stats()
+    history = get_result_history()
     if result is None:
         return "<h1>Could not fetch speedtest data</h1>"
     if stats is None:
         return "<h1>Could not fetch stats</h1>"
+    if history is None:
+        return "<h1>Could not fetch history</h1>"
+    
+    history_html = ""
+    failed_count = 0
+    for entry in history:
+        if entry['status'] == 'failed':
+            failed_count += 1
+            continue
+        history_html += f"<p>{entry['created_at']} — {entry['status']}: down {entry['download_bits_human']}, up {entry['upload_bits_human']}, ping {entry['ping']} ms</p>"
+
     return f"""
     <h1>Download: {result['download']}</h1>
     <h1>Upload: {result['upload']}</h1>
@@ -30,4 +42,7 @@ def homepage() -> str:
     <h1>Maximum Upload: {stats['upload']['max_bits_human']}</h1>
 
     <p>Total Results: {stats['total_results']}</p>
+
+    {history_html}
+    <p>Failed tests: {failed_count}</p>
     """

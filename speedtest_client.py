@@ -21,3 +21,10 @@ def get_latest_result() -> None | dict :
         }
     except requests.RequestException as e:
         print(e)
+
+def get_stats() -> None | dict:
+    try:
+        response = requests.get(f"{url}/api/v1/stats", headers=headers)
+        return response.json()["data"]
+    except requests.RequestException as e:
+        print(e)
